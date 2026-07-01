@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/maven/4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <groupId>de.starwit</groupId>
+    <artifactId>ad-order-api</artifactId>
+    <version>0.0.1-SNAPSHOT</version>
+    <description>Autonomous Driving Stack Order API</description>
+
+    <properties>
+        <java.version>25</java.version>
+        <openapi.generated.dir>${project.basedir}/generated</openapi.generated.dir>   
+    </properties>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.openapitools</groupId>
+                <artifactId>openapi-generator-maven-plugin</artifactId>
+                <version>7.23.0</version>
+                <executions>
+                    <execution>
+                        <id>generate-server-stubs</id>
+                        <goals>
+                            <goal>generate</goal>
+                        </goals>
+                        <configuration>
+                            <inputSpec>
+                                ${project.basedir}/spec/ad-stack-api.yaml
+                            </inputSpec>
+                            <output>${openapi.generated.dir}/java</output>
+                            <generatorName>spring</generatorName>
+                            <templateDirectory>${project.basedir}/templates/java</templateDirectory>
+                            <apiPackage>de.starwit.adorder.api</apiPackage>
+                            <modelPackage>de.starwit.adorder.model</modelPackage>
+                            <generateSupportingFiles>true</generateSupportingFiles>
+                            <generateApis>false</generateApis>
+                            <generateModels>true</generateModels>
+                            <generateModelDocumentation>false</generateModelDocumentation>
+                            <generateModelTests>false</generateModelTests>
+                            <configOptions>
+                                <useSpringBoot4>true</useSpringBoot4>
+                                <artifactVersion>${project.version}</artifactVersion>
+                                <groupId>de.starwit</groupId>
+                                <artifactId>ad-order-api-java</artifactId>
+                            </configOptions>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
+</project>
