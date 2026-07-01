@@ -1,0 +1,22 @@
+[package]
+name = "ad-order-api"
+version = "0.0.1-SNAPSHOT"
+authors = ["OpenAPI Generator team and contributors"]
+description = "API for submitting and managing ride orders to a vehicle's autonomous driving (AD) stack. This API runs within the vehicle's onboard network and serves exactly one vehicle. Onboard HMIs reach it directly; external backend systems reach it via an API gateway, which is responsible for vehicle identification and routing (e.g. mapping a fleet vehicle ID to this vehicle's network endpoint). This API is purely operational (vehicle/route oriented) and does not carry any customer or passenger data. "
+# Override this license by providing a License Object in the OpenAPI.
+license = "Unlicense"
+edition = "2021"
+
+[dependencies]
+serde = { version = "^1.0", features = ["derive"] }
+serde_json = "^1.0"
+serde_repr = "^0.1"
+url = "^2.5"
+uuid = { version = "^1.8", features = ["serde", "v4"] }
+chrono = { version = "^0.4",  features = ["serde"] }
+reqwest = { version = "^0.13", default-features = false, features = ["json", "multipart", "query", "form"] }
+
+[features]
+default = ["native-tls"]
+native-tls = ["reqwest/native-tls"]
+rustls = ["reqwest/rustls"]

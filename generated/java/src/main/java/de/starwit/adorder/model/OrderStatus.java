@@ -20,7 +20,7 @@ import com.fasterxml.jackson.annotation.JsonValue;
  * Lifecycle status of a ride order. `pending` -> `accepted` -> `in_progress` -> `completed`, with `rejected`, `cancelled` and `failed` as alternative/terminal outcomes. 
  */
 
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-07-01T11:19:45.250413236+02:00[Europe/Berlin]", comments = "Generator version: 7.23.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-07-01T11:42:33.323681150+02:00[Europe/Berlin]", comments = "Generator version: 7.23.0")
 public enum OrderStatus {
   
   PENDING("pending"),

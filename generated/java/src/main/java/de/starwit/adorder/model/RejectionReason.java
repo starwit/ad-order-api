@@ -20,7 +20,7 @@ import com.fasterxml.jackson.annotation.JsonValue;
  * Machine-readable reason code when status is `rejected` or `failed`
  */
 
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-07-01T11:19:45.250413236+02:00[Europe/Berlin]", comments = "Generator version: 7.23.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-07-01T11:42:33.323681150+02:00[Europe/Berlin]", comments = "Generator version: 7.23.0")
 public enum RejectionReason {
   
   TARGET_UNREACHABLE("target_unreachable"),

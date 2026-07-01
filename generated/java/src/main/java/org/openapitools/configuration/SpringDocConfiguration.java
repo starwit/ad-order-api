@@ -20,7 +20,7 @@ public class SpringDocConfiguration {
                         new Info()
                                 .title("AD Stack Ride Order API")
                                 .description("API for submitting and managing ride orders to a vehicle's autonomous driving (AD) stack. This API runs within the vehicle's onboard network and serves exactly one vehicle. Onboard HMIs reach it directly; external backend systems reach it via an API gateway, which is responsible for vehicle identification and routing (e.g. mapping a fleet vehicle ID to this vehicle's network endpoint). This API is purely operational (vehicle/route oriented) and does not carry any customer or passenger data. ")
-                                .version("1.0.0")
+                                .version("0.0.1")
                 )
         ;
     }

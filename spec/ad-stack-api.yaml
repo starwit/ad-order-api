@@ -9,7 +9,7 @@ info:
     and routing (e.g. mapping a fleet vehicle ID to this vehicle's network endpoint).
     This API is purely operational (vehicle/route oriented) and does not carry any
     customer or passenger data.
-  version: 1.0.0
+  version: 0.0.1
 
 servers:
   - url: http://localhost:8080/api/v1
