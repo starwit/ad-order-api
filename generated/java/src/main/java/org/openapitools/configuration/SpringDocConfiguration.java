@@ -19,8 +19,13 @@ public class SpringDocConfiguration {
                 .info(
                         new Info()
                                 .title("AD Stack Ride Order API")
-                                .description("API for submitting and managing ride orders to a vehicle's autonomous driving (AD) stack. This API runs within the vehicle's onboard network and serves exactly one vehicle. Onboard HMIs reach it directly; external backend systems reach it via an API gateway, which is responsible for vehicle identification and routing (e.g. mapping a fleet vehicle ID to this vehicle's network endpoint). This API is purely operational (vehicle/route oriented) and does not carry any customer or passenger data. ")
-                                .version("0.0.1")
+                                .description("REST API for submitting and managing ride orders to a vehicle's autonomous driving (AD) stack, and for querying current vehicle status and component inventory. Runs within the vehicle's onboard network and serves exactly one vehicle. Onboard HMIs reach it directly; backend systems reach it via an API gateway which handles vehicle identification and routing. ")
+                                .license(
+                                        new License()
+                                                .name("GNU Affero General Public License v3.0")
+                                                .url("https://www.gnu.org/licenses/agpl-3.0.html")
+                                )
+                                .version("1.0.0")
                 )
         ;
     }

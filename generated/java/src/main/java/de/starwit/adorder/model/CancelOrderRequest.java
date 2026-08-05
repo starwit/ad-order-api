@@ -4,7 +4,6 @@ import java.net.URI;
 import java.util.Objects;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonCreator;
-import com.fasterxml.jackson.annotation.JsonTypeName;
 import org.springframework.lang.Nullable;
 import org.openapitools.jackson.nullable.JsonNullable;
 import java.time.OffsetDateTime;
@@ -17,11 +16,11 @@ import java.util.*;
 import jakarta.annotation.Generated;
 
 /**
- * CancelOrderRequest
+ * Optional payload when cancelling a ride order
  */
 
-@JsonTypeName("cancelOrder_request")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-07-01T11:42:33.323681150+02:00[Europe/Berlin]", comments = "Generator version: 7.23.0")
+@Schema(name = "CancelOrderRequest", description = "Optional payload when cancelling a ride order")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-08-05T21:10:51.076418484+02:00[Europe/Berlin]", comments = "Generator version: 7.23.0")
 public class CancelOrderRequest {
 
   private @Nullable String reason;
@@ -32,11 +31,11 @@ public class CancelOrderRequest {
   }
 
   /**
-   * Free-text reason for cancellation, for logging/audit purposes
+   * Free-text reason for cancellation (logged/audited only)
    * @return reason
    */
   
-  @Schema(name = "reason", example = "Operator requested stop for maintenance", description = "Free-text reason for cancellation, for logging/audit purposes", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @Schema(name = "reason", example = "Operator requested stop for maintenance", description = "Free-text reason for cancellation (logged/audited only)", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("reason")
   public @Nullable String getReason() {
     return reason;

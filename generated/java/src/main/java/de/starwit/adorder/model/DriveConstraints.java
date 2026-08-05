@@ -4,8 +4,7 @@ import java.net.URI;
 import java.util.Objects;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonCreator;
-import com.fasterxml.jackson.annotation.JsonTypeName;
-import de.starwit.adorder.model.RideOrderRequestConstraintsAvoidAreasInner;
+import de.starwit.adorder.model.AvoidArea;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -22,30 +21,29 @@ import java.util.*;
 import jakarta.annotation.Generated;
 
 /**
- * Optional operational constraints for the drive
+ * Optional operational constraints scoped to a single order
  */
 
-@Schema(name = "RideOrderRequest_constraints", description = "Optional operational constraints for the drive")
-@JsonTypeName("RideOrderRequest_constraints")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-07-01T11:42:33.323681150+02:00[Europe/Berlin]", comments = "Generator version: 7.23.0")
-public class RideOrderRequestConstraints {
+@Schema(name = "DriveConstraints", description = "Optional operational constraints scoped to a single order")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-08-05T21:10:51.076418484+02:00[Europe/Berlin]", comments = "Generator version: 7.23.0")
+public class DriveConstraints {
 
   private @Nullable BigDecimal maxSpeedKph;
 
-  private List<@Valid RideOrderRequestConstraintsAvoidAreasInner> avoidAreas = new ArrayList<>();
+  private List<@Valid AvoidArea> avoidAreas = new ArrayList<>();
 
-  public RideOrderRequestConstraints maxSpeedKph(@Nullable BigDecimal maxSpeedKph) {
+  public DriveConstraints maxSpeedKph(@Nullable BigDecimal maxSpeedKph) {
     this.maxSpeedKph = maxSpeedKph;
     return this;
   }
 
   /**
-   * Optional speed cap for this order
+   * Speed cap for this order in km/h
    * minimum: 0
    * @return maxSpeedKph
    */
   @Valid @DecimalMin(value = "0") 
-  @Schema(name = "maxSpeedKph", description = "Optional speed cap for this order", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @Schema(name = "maxSpeedKph", description = "Speed cap for this order in km/h", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("maxSpeedKph")
   public @Nullable BigDecimal getMaxSpeedKph() {
     return maxSpeedKph;
@@ -56,12 +54,12 @@ public class RideOrderRequestConstraints {
     this.maxSpeedKph = maxSpeedKph;
   }
 
-  public RideOrderRequestConstraints avoidAreas(List<@Valid RideOrderRequestConstraintsAvoidAreasInner> avoidAreas) {
+  public DriveConstraints avoidAreas(List<@Valid AvoidArea> avoidAreas) {
     this.avoidAreas = avoidAreas;
     return this;
   }
 
-  public RideOrderRequestConstraints addAvoidAreasItem(RideOrderRequestConstraintsAvoidAreasInner avoidAreasItem) {
+  public DriveConstraints addAvoidAreasItem(AvoidArea avoidAreasItem) {
     if (this.avoidAreas == null) {
       this.avoidAreas = new ArrayList<>();
     }
@@ -70,18 +68,18 @@ public class RideOrderRequestConstraints {
   }
 
   /**
-   * Optional list of areas to avoid, e.g. geofenced zones under maintenance
+   * Geofenced areas to avoid, e.g. zones under maintenance
    * @return avoidAreas
    */
   @Valid 
-  @Schema(name = "avoidAreas", description = "Optional list of areas to avoid, e.g. geofenced zones under maintenance", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @Schema(name = "avoidAreas", description = "Geofenced areas to avoid, e.g. zones under maintenance", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("avoidAreas")
-  public List<@Valid RideOrderRequestConstraintsAvoidAreasInner> getAvoidAreas() {
+  public List<@Valid AvoidArea> getAvoidAreas() {
     return avoidAreas;
   }
 
   @JsonProperty("avoidAreas")
-  public void setAvoidAreas(List<@Valid RideOrderRequestConstraintsAvoidAreasInner> avoidAreas) {
+  public void setAvoidAreas(List<@Valid AvoidArea> avoidAreas) {
     this.avoidAreas = avoidAreas;
   }
 
@@ -93,9 +91,9 @@ public class RideOrderRequestConstraints {
     if (o == null || getClass() != o.getClass()) {
       return false;
     }
-    RideOrderRequestConstraints rideOrderRequestConstraints = (RideOrderRequestConstraints) o;
-    return Objects.equals(this.maxSpeedKph, rideOrderRequestConstraints.maxSpeedKph) &&
-        Objects.equals(this.avoidAreas, rideOrderRequestConstraints.avoidAreas);
+    DriveConstraints driveConstraints = (DriveConstraints) o;
+    return Objects.equals(this.maxSpeedKph, driveConstraints.maxSpeedKph) &&
+        Objects.equals(this.avoidAreas, driveConstraints.avoidAreas);
   }
 
   @Override
@@ -106,7 +104,7 @@ public class RideOrderRequestConstraints {
   @Override
   public String toString() {
     StringBuilder sb = new StringBuilder();
-    sb.append("class RideOrderRequestConstraints {\n");
+    sb.append("class DriveConstraints {\n");
     sb.append("    maxSpeedKph: ").append(toIndentedString(maxSpeedKph)).append("\n");
     sb.append("    avoidAreas: ").append(toIndentedString(avoidAreas)).append("\n");
     sb.append("}");

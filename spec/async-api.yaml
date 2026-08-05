@@ -1,0 +1,88 @@
+asyncapi: 3.0.0
+info:
+  title: AD Stack Telemetry API
+  description: >
+    AsyncAPI specification for MQTT telemetry published by the AD stack.
+    The AD stack acts as publisher on both topics; onboard HMIs and backend
+    systems (via API gateway) act as subscribers. Data types are defined in
+    schemas/common.yaml and shared with the REST order API.
+  version: 1.0.0
+  license:
+    name: GNU Affero General Public License v3.0
+    url: https://www.gnu.org/licenses/agpl-3.0.html
+
+servers:
+  onboard:
+    host: localhost:1883
+    protocol: mqtt
+    description: Vehicle-local MQTT broker (reached directly by onboard HMI)
+  gateway:
+    host: fleet.example.com:8883
+    protocol: mqtts
+    description: TLS-secured broker endpoint exposed via API gateway to backend systems
+
+channels:
+  vehicleStatus:
+    address: /vehicle/status
+    description: >
+      Periodic snapshot of current vehicle state: AD stack mode, position,
+      kinematics (speed, heading, acceleration), and battery status.
+      Published at a regular interval regardless of whether anything has changed.
+    messages:
+      vehicleStatusMessage:
+        $ref: '#/components/messages/VehicleStatusMessage'
+    bindings:
+      mqtt:
+        qos: 1
+        retain: true
+
+  vehicleOrders:
+    address: /vehicle/orders
+    description: >
+      Current snapshot of all non-terminal ride orders. Published whenever
+      any order changes state, and also periodically as a heartbeat.
+      Subscribers can use this topic to stay in sync without polling the REST API.
+    messages:
+      vehicleOrdersMessage:
+        $ref: '#/components/messages/VehicleOrdersMessage'
+    bindings:
+      mqtt:
+        qos: 1
+        retain: true
+
+operations:
+  publishVehicleStatus:
+    action: send
+    channel:
+      $ref: '#/channels/vehicleStatus'
+    description: AD stack publishes vehicle status snapshots
+    bindings:
+      mqtt:
+        qos: 1
+
+  publishVehicleOrders:
+    action: send
+    channel:
+      $ref: '#/channels/vehicleOrders'
+    description: AD stack publishes order state snapshots on every order state change
+    bindings:
+      mqtt:
+        qos: 1
+
+components:
+  messages:
+    VehicleStatusMessage:
+      name: VehicleStatusMessage
+      title: Vehicle Status
+      summary: Periodic vehicle status snapshot
+      contentType: application/json
+      payload:
+        $ref: './order-api.yaml#/components/schemas/VehicleStatus'
+
+    VehicleOrdersMessage:
+      name: VehicleOrdersMessage
+      title: Vehicle Orders
+      summary: Current non-terminal order list
+      contentType: application/json
+      payload:
+        $ref: './order-api.yaml#/components/schemas/OrderList'

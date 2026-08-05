@@ -1,0 +1,665 @@
+openapi: 3.1.0
+info:
+  title: AD Stack Ride Order API
+  description: >
+    REST API for submitting and managing ride orders to a vehicle's autonomous
+    driving (AD) stack, and for querying current vehicle status and component
+    inventory. Runs within the vehicle's onboard network and serves exactly one
+    vehicle. Onboard HMIs reach it directly; backend systems reach it via an
+    API gateway which handles vehicle identification and routing.
+  version: 1.0.0
+  license:
+    name: GNU Affero General Public License v3.0
+    url: https://www.gnu.org/licenses/agpl-3.0.html
+
+servers:
+  - url: http://localhost:8080/api/v1
+    description: Onboard network endpoint
+
+tags:
+  - name: Orders
+    description: Creating and managing ride orders
+  - name: Vehicle
+    description: Vehicle status and software component inventory
+
+paths:
+
+  /orders:
+    post:
+      tags: [Orders]
+      summary: Create a new ride order
+      description: >
+        Submits a new ride order to the AD stack. The stack evaluates
+        feasibility immediately; the returned order may already be in
+        `rejected` state if the request cannot be fulfilled.
+      operationId: createOrder
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateOrderRequest'
+            example:
+              source:
+                type: backend
+                id: fleet-manager-1
+              stops:
+                - location:
+                    latitude: 52.4226
+                    longitude: 10.7865
+                    label: "Depot Gate B"
+              priority: normal
+      responses:
+        '201':
+          description: Order created; inspect `status` field for AD stack evaluation result
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RideOrder'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '409':
+          description: An active order already exists and queuing is not supported
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+    get:
+      tags: [Orders]
+      summary: List all ride orders
+      description: Returns all orders, optionally filtered by status.
+      operationId: listOrders
+      parameters:
+        - name: status
+          in: query
+          description: Filter by order status
+          schema:
+            $ref: '#/components/schemas/OrderStatus'
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 200
+            default: 50
+        - name: offset
+          in: query
+          schema:
+            type: integer
+            minimum: 0
+            default: 0
+      responses:
+        '200':
+          description: Paginated list of ride orders
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OrderList'
+
+  /orders/{orderId}:
+    parameters:
+      - $ref: '#/components/parameters/OrderId'
+
+    get:
+      tags: [Orders]
+      summary: Get a specific ride order
+      operationId: getOrder
+      responses:
+        '200':
+          description: Ride order details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RideOrder'
+        '404':
+          $ref: '#/components/responses/OrderNotFound'
+
+    patch:
+      tags: [Orders]
+      summary: Update a ride order
+      description: >
+        Updates a pending or accepted order. Only `stops`, `priority`, and
+        `constraints` may be updated. Updates to an `in_progress` order are
+        limited to appending new stops; changes to already-reached stops or
+        the priority of an active drive are rejected with 409.
+      operationId: updateOrder
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateOrderRequest'
+      responses:
+        '200':
+          description: Updated order
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RideOrder'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          $ref: '#/components/responses/OrderNotFound'
+        '409':
+          description: Order is in a state that does not allow the requested update
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /orders/{orderId}/cancel:
+    parameters:
+      - $ref: '#/components/parameters/OrderId'
+
+    post:
+      tags: [Orders]
+      summary: Cancel a ride order
+      description: >
+        Requests cancellation of an active order. The AD stack brings the
+        vehicle to a safe stop before transitioning the order to `cancelled`,
+        so the transition is asynchronous.
+      operationId: cancelOrder
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CancelOrderRequest'
+      responses:
+        '202':
+          description: Cancellation request accepted; order transitions asynchronously
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RideOrder'
+        '404':
+          $ref: '#/components/responses/OrderNotFound'
+        '409':
+          description: Order is already in a terminal state
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /vehicle/status:
+    get:
+      tags: [Vehicle]
+      summary: Get current vehicle status
+      description: >
+        Returns a snapshot of current vehicle state: AD stack mode, position,
+        kinematics (speed, heading), and battery status. This is the same
+        data structure published on the MQTT /vehicle/status topic.
+      operationId: getVehicleStatus
+      responses:
+        '200':
+          description: Current vehicle status snapshot
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/VehicleStatus'
+
+  /vehicle/components:
+    get:
+      tags: [Vehicle]
+      summary: Get software component inventory
+      description: >
+        Returns the list of all software components running in the AD stack,
+        including their names, versions, and current health status.
+      operationId: getComponentList
+      responses:
+        '200':
+          description: Software component inventory
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ComponentList'
+
+components:
+  parameters:
+    OrderId:
+      name: orderId
+      in: path
+      required: true
+      description: Unique identifier of the ride order
+      schema:
+        type: string
+        format: uuid
+
+  responses:
+    BadRequest:
+      description: Request payload is invalid or missing required fields
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    OrderNotFound:
+      description: No order with the given ID exists
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+
+  schemas:
+
+    # -------------------------------------------------------------------------
+    # Primitives / Geo
+    # -------------------------------------------------------------------------
+
+    GeoPoint:
+      type: object
+      description: A geographic position with optional heading
+      required: [latitude, longitude]
+      properties:
+        latitude:
+          type: number
+          format: double
+          minimum: -90
+          maximum: 90
+          example: 52.4226
+        longitude:
+          type: number
+          format: double
+          minimum: -180
+          maximum: 180
+          example: 10.7865
+        headingDegrees:
+          type: number
+          format: double
+          minimum: 0
+          maximum: 360
+          description: Compass heading in degrees (0 = north)
+          example: 270.0
+        label:
+          type: string
+          description: Optional human-readable name for the location
+          example: "Gate B - Bay 3"
+
+    # -------------------------------------------------------------------------
+    # Order types
+    # -------------------------------------------------------------------------
+
+    OrderSource:
+      type: object
+      description: Identifies the system or client that issued an order
+      required: [type, id]
+      properties:
+        type:
+          type: string
+          enum: [onboard_hmi, backend]
+          description: Whether the order originated from an onboard HMI or a backend system
+        id:
+          type: string
+          description: Identifier of the specific HMI instance or backend service
+          example: "hmi-driver-console-1"
+
+    OrderStatus:
+      type: string
+      description: >
+        Lifecycle status of a ride order.
+        Flow: pending -> accepted -> in_progress -> completed.
+        Alternate terminals: rejected, cancelled, failed.
+      enum:
+        - pending
+        - accepted
+        - rejected
+        - in_progress
+        - completed
+        - cancelled
+        - failed
+
+    RejectionReason:
+      type: string
+      description: Machine-readable reason code when an order is rejected or fails
+      enum:
+        - target_unreachable
+        - vehicle_unavailable
+        - vehicle_in_fault_state
+        - outside_operational_domain
+        - other
+
+    Stop:
+      type: object
+      description: A single waypoint in an order's route
+      required: [location]
+      properties:
+        stopId:
+          type: string
+          format: uuid
+          description: Assigned by the AD stack when the stop is added
+        location:
+          $ref: '#/components/schemas/GeoPoint'
+        sequenceNumber:
+          type: integer
+          minimum: 0
+          description: >
+            Position of this stop in the route. 0 is the first stop after
+            departure. The AD stack may reorder stops if not supplied.
+        scheduledArrival:
+          type: string
+          format: date-time
+          description: Optional target arrival time at this stop
+        status:
+          type: string
+          enum: [pending, reached, skipped]
+          default: pending
+
+    AvoidArea:
+      type: object
+      description: A geofenced area the vehicle should avoid
+      required: [polygon]
+      properties:
+        label:
+          type: string
+        polygon:
+          type: array
+          description: Closed polygon defined as an ordered list of GeoPoints
+          minItems: 3
+          items:
+            $ref: '#/components/schemas/GeoPoint'
+
+    DriveConstraints:
+      type: object
+      description: Optional operational constraints scoped to a single order
+      properties:
+        maxSpeedKph:
+          type: number
+          minimum: 0
+          description: Speed cap for this order in km/h
+        avoidAreas:
+          type: array
+          description: Geofenced areas to avoid, e.g. zones under maintenance
+          items:
+            $ref: '#/components/schemas/AvoidArea'
+
+    RideOrder:
+      type: object
+      description: A ride order and its current execution state
+      required: [orderId, source, stops, status, createdAt]
+      properties:
+        orderId:
+          type: string
+          format: uuid
+        clientOrderId:
+          type: string
+          description: Optional client-supplied idempotency key / external reference
+          example: "fleet-job-88421"
+        source:
+          $ref: '#/components/schemas/OrderSource'
+        stops:
+          type: array
+          description: >
+            Ordered list of waypoints the vehicle shall visit. Must contain at
+            least one stop (the final destination). The vehicle always departs
+            from its current position at order acceptance time.
+          minItems: 1
+          items:
+            $ref: '#/components/schemas/Stop'
+        startPosition:
+          $ref: '#/components/schemas/GeoPoint'
+        status:
+          $ref: '#/components/schemas/OrderStatus'
+        rejectionReason:
+          $ref: '#/components/schemas/RejectionReason'
+        statusDetail:
+          type: string
+          description: Free-text detail, e.g. fault description on failure
+        priority:
+          type: string
+          enum: [normal, high]
+          default: normal
+        constraints:
+          $ref: '#/components/schemas/DriveConstraints'
+        createdAt:
+          type: string
+          format: date-time
+        acceptedAt:
+          type: string
+          format: date-time
+        startedAt:
+          type: string
+          format: date-time
+          description: When the AD stack began physically executing the drive
+        completedAt:
+          type: string
+          format: date-time
+        estimatedArrival:
+          type: string
+          format: date-time
+          description: Current ETA at the final stop, updated while in_progress
+        distanceRemainingMeters:
+          type: number
+          description: Remaining distance to final stop, updated while in_progress
+
+    OrderList:
+      type: object
+      description: Paginated list of ride orders
+      required: [items, total]
+      properties:
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/RideOrder'
+        total:
+          type: integer
+          description: Total number of orders matching the applied filter
+
+    # -------------------------------------------------------------------------
+    # Request bodies
+    # -------------------------------------------------------------------------
+
+    CreateOrderRequest:
+      type: object
+      description: Payload to create a new ride order
+      required: [source, stops]
+      properties:
+        source:
+          $ref: '#/components/schemas/OrderSource'
+        stops:
+          type: array
+          description: >
+            Ordered list of stops the vehicle shall visit. Must contain at
+            least one stop (the final destination).
+          minItems: 1
+          items:
+            $ref: '#/components/schemas/Stop'
+        priority:
+          type: string
+          enum: [normal, high]
+          default: normal
+        clientOrderId:
+          type: string
+          description: Optional idempotency key / external system reference
+          example: "fleet-job-88421"
+        notBeforeTimestamp:
+          type: string
+          format: date-time
+          description: Earliest time at which the AD stack should begin executing the order
+        constraints:
+          $ref: '#/components/schemas/DriveConstraints'
+
+    UpdateOrderRequest:
+      type: object
+      description: >
+        Partial update to a ride order. Only supplied fields are modified.
+        At least one field must be present.
+      properties:
+        stops:
+          type: array
+          description: >
+            Replacement stop list. For in_progress orders only appending
+            new stops (higher sequence numbers) is permitted.
+          minItems: 1
+          items:
+            $ref: '#/components/schemas/Stop'
+        priority:
+          type: string
+          enum: [normal, high]
+        constraints:
+          $ref: '#/components/schemas/DriveConstraints'
+
+    CancelOrderRequest:
+      type: object
+      description: Optional payload when cancelling a ride order
+      properties:
+        reason:
+          type: string
+          description: Free-text reason for cancellation (logged/audited only)
+          example: "Operator requested stop for maintenance"
+
+    # -------------------------------------------------------------------------
+    # Vehicle status
+    # -------------------------------------------------------------------------
+
+    AdStackMode:
+      type: string
+      description: Current operational mode of the AD stack
+      enum:
+        - initializing
+        - idle
+        - executing_order
+        - manual_override
+        - fault
+
+    BatteryStatus:
+      type: object
+      description: Current battery / energy storage status
+      required: [stateOfChargePercent]
+      properties:
+        stateOfChargePercent:
+          type: number
+          format: double
+          minimum: 0
+          maximum: 100
+          description: State of charge as a percentage
+          example: 73.4
+        estimatedRangeKm:
+          type: number
+          format: double
+          minimum: 0
+          description: Estimated remaining range in kilometres
+          example: 142.0
+        charging:
+          type: boolean
+          description: Whether the vehicle is currently charging
+          example: false
+        healthPercent:
+          type: number
+          format: double
+          minimum: 0
+          maximum: 100
+          description: Battery health as a percentage of design capacity
+          example: 96.1
+
+    VehicleKinematics:
+      type: object
+      description: Current motion state of the vehicle
+      required: [speedKph, headingDegrees]
+      properties:
+        speedKph:
+          type: number
+          format: double
+          minimum: 0
+          description: Current speed in km/h
+          example: 24.5
+        headingDegrees:
+          type: number
+          format: double
+          minimum: 0
+          maximum: 360
+          description: Current compass heading in degrees (0 = north)
+          example: 90.0
+        accelerationMps2:
+          type: number
+          format: double
+          description: Current longitudinal acceleration in m/s²
+          example: 0.3
+
+    VehicleStatus:
+      type: object
+      description: >
+        Complete snapshot of the vehicle's current status. Published on the
+        MQTT /vehicle/status topic and also returned by the REST status endpoint.
+      required: [adStackMode, kinematics, position, battery, timestamp]
+      properties:
+        adStackMode:
+          $ref: '#/components/schemas/AdStackMode'
+        adStackReady:
+          type: boolean
+          description: Whether the AD stack can currently accept new orders
+        activeOrderId:
+          type: string
+          format: uuid
+          description: ID of the order currently being executed, if any
+        kinematics:
+          $ref: '#/components/schemas/VehicleKinematics'
+        position:
+          $ref: '#/components/schemas/GeoPoint'
+        battery:
+          $ref: '#/components/schemas/BatteryStatus'
+        timestamp:
+          type: string
+          format: date-time
+          description: Time at which this snapshot was captured
+
+    # -------------------------------------------------------------------------
+    # Software component inventory
+    # -------------------------------------------------------------------------
+
+    SoftwareComponent:
+      type: object
+      description: A single versioned software component running in the AD stack
+      required: [name, version]
+      properties:
+        name:
+          type: string
+          description: Component name
+          example: "perception-module"
+        version:
+          type: string
+          description: Semantic version string
+          example: "2.4.1"
+        buildId:
+          type: string
+          description: Optional build or commit identifier
+          example: "git-a3f9c12"
+        status:
+          type: string
+          enum: [running, degraded, stopped, unknown]
+          default: unknown
+        description:
+          type: string
+          description: Optional human-readable description of the component
+          example: "LiDAR-based obstacle detection pipeline"
+
+    ComponentList:
+      type: object
+      description: Full inventory of software components in the AD stack
+      required: [components, timestamp]
+      properties:
+        components:
+          type: array
+          items:
+            $ref: '#/components/schemas/SoftwareComponent'
+        timestamp:
+          type: string
+          format: date-time
+          description: Time at which the inventory was captured
+
+    # -------------------------------------------------------------------------
+    # Error
+    # -------------------------------------------------------------------------
+
+    Error:
+      type: object
+      required: [code, message]
+      properties:
+        code:
+          type: string
+          example: "ORDER_NOT_FOUND"
+        message:
+          type: string
+          example: "No order with the given ID exists."
+        details:
+          type: object
+          additionalProperties: true

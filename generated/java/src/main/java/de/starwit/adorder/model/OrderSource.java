@@ -17,15 +17,15 @@ import java.util.*;
 import jakarta.annotation.Generated;
 
 /**
- * Identifies the system/client that issued the order
+ * Identifies the system or client that issued an order
  */
 
-@Schema(name = "OrderSource", description = "Identifies the system/client that issued the order")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-07-01T11:42:33.323681150+02:00[Europe/Berlin]", comments = "Generator version: 7.23.0")
+@Schema(name = "OrderSource", description = "Identifies the system or client that issued an order")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-08-05T21:10:51.076418484+02:00[Europe/Berlin]", comments = "Generator version: 7.23.0")
 public class OrderSource {
 
   /**
-   * Whether the order originated from an onboard HMI or a backend system (arriving via the API gateway)
+   * Whether the order originated from an onboard HMI or a backend system
    */
   public enum TypeEnum {
     ONBOARD_HMI("onboard_hmi"),
@@ -81,11 +81,11 @@ public class OrderSource {
   }
 
   /**
-   * Whether the order originated from an onboard HMI or a backend system (arriving via the API gateway)
+   * Whether the order originated from an onboard HMI or a backend system
    * @return type
    */
   @NotNull 
-  @Schema(name = "type", description = "Whether the order originated from an onboard HMI or a backend system (arriving via the API gateway)", requiredMode = Schema.RequiredMode.REQUIRED)
+  @Schema(name = "type", description = "Whether the order originated from an onboard HMI or a backend system", requiredMode = Schema.RequiredMode.REQUIRED)
   @JsonProperty("type")
   public TypeEnum getType() {
     return type;
@@ -102,11 +102,11 @@ public class OrderSource {
   }
 
   /**
-   * Identifier of the specific HMI instance or backend service/client
+   * Identifier of the specific HMI instance or backend service
    * @return id
    */
   @NotNull 
-  @Schema(name = "id", example = "hmi-driver-console-1", description = "Identifier of the specific HMI instance or backend service/client", requiredMode = Schema.RequiredMode.REQUIRED)
+  @Schema(name = "id", example = "hmi-driver-console-1", description = "Identifier of the specific HMI instance or backend service", requiredMode = Schema.RequiredMode.REQUIRED)
   @JsonProperty("id")
   public String getId() {
     return id;

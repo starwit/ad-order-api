@@ -112,6 +112,6 @@ impl From<&str> for ContentType {
 }
 
 pub mod orders_api;
-pub mod vehicle_state_api;
+pub mod vehicle_api;
 
 pub mod configuration;

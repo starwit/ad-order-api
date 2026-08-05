@@ -11,22 +11,22 @@
 use crate::models;
 use serde::{Deserialize, Serialize};
 
+/// OrderList : Paginated list of ride orders
 #[derive(Clone, Default, Debug, PartialEq, Serialize, Deserialize)]
-pub struct Error {
-    #[serde(rename = "code")]
-    pub code: String,
-    #[serde(rename = "message")]
-    pub message: String,
-    #[serde(rename = "details", skip_serializing_if = "Option::is_none")]
-    pub details: Option<std::collections::HashMap<String, serde_json::Value>>,
+pub struct OrderList {
+    #[serde(rename = "items")]
+    pub items: Vec<models::RideOrder>,
+    /// Total number of orders matching the applied filter
+    #[serde(rename = "total")]
+    pub total: i32,
 }
 
-impl Error {
-    pub fn new(code: String, message: String) -> Error {
-        Error {
-            code,
-            message,
-            details: None,
+impl OrderList {
+    /// Paginated list of ride orders
+    pub fn new(items: Vec<models::RideOrder>, total: i32) -> OrderList {
+        OrderList {
+            items,
+            total,
         }
     }
 }

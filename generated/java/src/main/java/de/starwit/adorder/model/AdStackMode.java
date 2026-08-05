@@ -17,29 +17,25 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonValue;
 
 /**
- * Lifecycle status of a ride order. Flow: pending -> accepted -> in_progress -> completed. Alternate terminals: rejected, cancelled, failed. 
+ * Current operational mode of the AD stack
  */
 
 @Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-08-05T21:10:51.076418484+02:00[Europe/Berlin]", comments = "Generator version: 7.23.0")
-public enum OrderStatus {
+public enum AdStackMode {
   
-  PENDING("pending"),
+  INITIALIZING("initializing"),
   
-  ACCEPTED("accepted"),
+  IDLE("idle"),
   
-  REJECTED("rejected"),
+  EXECUTING_ORDER("executing_order"),
   
-  IN_PROGRESS("in_progress"),
+  MANUAL_OVERRIDE("manual_override"),
   
-  COMPLETED("completed"),
-  
-  CANCELLED("cancelled"),
-  
-  FAILED("failed");
+  FAULT("fault");
 
   private final String value;
 
-  OrderStatus(String value) {
+  AdStackMode(String value) {
     this.value = value;
   }
 
@@ -54,8 +50,8 @@ public enum OrderStatus {
   }
 
   @JsonCreator
-  public static OrderStatus fromValue(String value) {
-    for (OrderStatus b : OrderStatus.values()) {
+  public static AdStackMode fromValue(String value) {
+    for (AdStackMode b : AdStackMode.values()) {
       if (b.value.equals(value)) {
         return b;
       }

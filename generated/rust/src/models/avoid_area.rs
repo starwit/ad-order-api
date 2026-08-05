@@ -11,22 +11,22 @@
 use crate::models;
 use serde::{Deserialize, Serialize};
 
+/// AvoidArea : A geofenced area the vehicle should avoid
 #[derive(Clone, Default, Debug, PartialEq, Serialize, Deserialize)]
-pub struct Error {
-    #[serde(rename = "code")]
-    pub code: String,
-    #[serde(rename = "message")]
-    pub message: String,
-    #[serde(rename = "details", skip_serializing_if = "Option::is_none")]
-    pub details: Option<std::collections::HashMap<String, serde_json::Value>>,
+pub struct AvoidArea {
+    #[serde(rename = "label", skip_serializing_if = "Option::is_none")]
+    pub label: Option<String>,
+    /// Closed polygon defined as an ordered list of GeoPoints
+    #[serde(rename = "polygon")]
+    pub polygon: Vec<models::GeoPoint>,
 }
 
-impl Error {
-    pub fn new(code: String, message: String) -> Error {
-        Error {
-            code,
-            message,
-            details: None,
+impl AvoidArea {
+    /// A geofenced area the vehicle should avoid
+    pub fn new(polygon: Vec<models::GeoPoint>) -> AvoidArea {
+        AvoidArea {
+            label: None,
+            polygon,
         }
     }
 }

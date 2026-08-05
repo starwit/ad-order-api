@@ -16,11 +16,11 @@ import java.util.*;
 import jakarta.annotation.Generated;
 
 /**
- * A geographic position, optionally with heading
+ * A geographic position with optional heading
  */
 
-@Schema(name = "GeoPoint", description = "A geographic position, optionally with heading")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-07-01T11:42:33.323681150+02:00[Europe/Berlin]", comments = "Generator version: 7.23.0")
+@Schema(name = "GeoPoint", description = "A geographic position with optional heading")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-08-05T21:10:51.076418484+02:00[Europe/Berlin]", comments = "Generator version: 7.23.0")
 public class GeoPoint {
 
   private Double latitude;
@@ -95,13 +95,13 @@ public class GeoPoint {
   }
 
   /**
-   * Compass heading in degrees (0 = north), if a specific approach/departure orientation is required
+   * Compass heading in degrees (0 = north)
    * minimum: 0
    * maximum: 360
    * @return headingDegrees
    */
   @DecimalMin(value = "0") @DecimalMax(value = "360") 
-  @Schema(name = "headingDegrees", example = "90.0", description = "Compass heading in degrees (0 = north), if a specific approach/departure orientation is required", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @Schema(name = "headingDegrees", example = "270.0", description = "Compass heading in degrees (0 = north)", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("headingDegrees")
   public @Nullable Double getHeadingDegrees() {
     return headingDegrees;
@@ -118,11 +118,11 @@ public class GeoPoint {
   }
 
   /**
-   * Optional human-readable name for the location (e.g. a known waypoint or stop)
+   * Optional human-readable name for the location
    * @return label
    */
   
-  @Schema(name = "label", example = "Gate B - Bay 3", description = "Optional human-readable name for the location (e.g. a known waypoint or stop)", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @Schema(name = "label", example = "Gate B - Bay 3", description = "Optional human-readable name for the location", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("label")
   public @Nullable String getLabel() {
     return label;

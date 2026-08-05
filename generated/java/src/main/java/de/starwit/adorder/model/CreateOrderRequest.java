@@ -5,10 +5,13 @@ import java.util.Objects;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonValue;
-import de.starwit.adorder.model.GeoPoint;
+import de.starwit.adorder.model.DriveConstraints;
 import de.starwit.adorder.model.OrderSource;
-import de.starwit.adorder.model.RideOrderRequestConstraints;
+import de.starwit.adorder.model.Stop;
 import java.time.OffsetDateTime;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.lang.Nullable;
 import org.openapitools.jackson.nullable.JsonNullable;
@@ -22,19 +25,19 @@ import java.util.*;
 import jakarta.annotation.Generated;
 
 /**
- * Payload to request a new ride order
+ * Payload to create a new ride order
  */
 
-@Schema(name = "RideOrderRequest", description = "Payload to request a new ride order")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-07-01T11:42:33.323681150+02:00[Europe/Berlin]", comments = "Generator version: 7.23.0")
-public class RideOrderRequest {
+@Schema(name = "CreateOrderRequest", description = "Payload to create a new ride order")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-08-05T21:10:51.076418484+02:00[Europe/Berlin]", comments = "Generator version: 7.23.0")
+public class CreateOrderRequest {
 
   private OrderSource source;
 
-  private GeoPoint target;
+  private List<@Valid Stop> stops = new ArrayList<>();
 
   /**
-   * Optional priority hint, relevant if a queuing mechanism is added later
+   * Gets or Sets priority
    */
   public enum PriorityEnum {
     NORMAL("normal"),
@@ -75,21 +78,21 @@ public class RideOrderRequest {
   @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
   private @Nullable OffsetDateTime notBeforeTimestamp;
 
-  private @Nullable RideOrderRequestConstraints constraints;
+  private @Nullable DriveConstraints constraints;
 
-  public RideOrderRequest() {
+  public CreateOrderRequest() {
     super();
   }
 
   /**
    * Constructor with only required parameters
    */
-  public RideOrderRequest(OrderSource source, GeoPoint target) {
+  public CreateOrderRequest(OrderSource source, List<@Valid Stop> stops) {
     this.source = source;
-    this.target = target;
+    this.stops = stops;
   }
 
-  public RideOrderRequest source(OrderSource source) {
+  public CreateOrderRequest source(OrderSource source) {
     this.source = source;
     return this;
   }
@@ -110,38 +113,46 @@ public class RideOrderRequest {
     this.source = source;
   }
 
-  public RideOrderRequest target(GeoPoint target) {
-    this.target = target;
+  public CreateOrderRequest stops(List<@Valid Stop> stops) {
+    this.stops = stops;
+    return this;
+  }
+
+  public CreateOrderRequest addStopsItem(Stop stopsItem) {
+    if (this.stops == null) {
+      this.stops = new ArrayList<>();
+    }
+    this.stops.add(stopsItem);
     return this;
   }
 
   /**
-   * Destination the AD stack should drive to. Current position is taken from the vehicle's live state at acceptance time, not supplied by the client.
-   * @return target
+   * Ordered list of stops the vehicle shall visit. Must contain at least one stop (the final destination). 
+   * @return stops
    */
-  @NotNull @Valid 
-  @Schema(name = "target", description = "Destination the AD stack should drive to. Current position is taken from the vehicle's live state at acceptance time, not supplied by the client.", requiredMode = Schema.RequiredMode.REQUIRED)
-  @JsonProperty("target")
-  public GeoPoint getTarget() {
-    return target;
+  @NotNull @Valid @Size(min = 1) 
+  @Schema(name = "stops", description = "Ordered list of stops the vehicle shall visit. Must contain at least one stop (the final destination). ", requiredMode = Schema.RequiredMode.REQUIRED)
+  @JsonProperty("stops")
+  public List<@Valid Stop> getStops() {
+    return stops;
   }
 
-  @JsonProperty("target")
-  public void setTarget(GeoPoint target) {
-    this.target = target;
+  @JsonProperty("stops")
+  public void setStops(List<@Valid Stop> stops) {
+    this.stops = stops;
   }
 
-  public RideOrderRequest priority(PriorityEnum priority) {
+  public CreateOrderRequest priority(PriorityEnum priority) {
     this.priority = priority;
     return this;
   }
 
   /**
-   * Optional priority hint, relevant if a queuing mechanism is added later
+   * Get priority
    * @return priority
    */
   
-  @Schema(name = "priority", description = "Optional priority hint, relevant if a queuing mechanism is added later", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @Schema(name = "priority", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("priority")
   public PriorityEnum getPriority() {
     return priority;
@@ -152,17 +163,17 @@ public class RideOrderRequest {
     this.priority = priority;
   }
 
-  public RideOrderRequest clientOrderId(@Nullable String clientOrderId) {
+  public CreateOrderRequest clientOrderId(@Nullable String clientOrderId) {
     this.clientOrderId = clientOrderId;
     return this;
   }
 
   /**
-   * Optional idempotency key / client-side reference for correlating with external systems (e.g. a backend job ID)
+   * Optional idempotency key / external system reference
    * @return clientOrderId
    */
   
-  @Schema(name = "clientOrderId", example = "fleet-job-88421", description = "Optional idempotency key / client-side reference for correlating with external systems (e.g. a backend job ID)", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @Schema(name = "clientOrderId", example = "fleet-job-88421", description = "Optional idempotency key / external system reference", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("clientOrderId")
   public @Nullable String getClientOrderId() {
     return clientOrderId;
@@ -173,17 +184,17 @@ public class RideOrderRequest {
     this.clientOrderId = clientOrderId;
   }
 
-  public RideOrderRequest notBeforeTimestamp(@Nullable OffsetDateTime notBeforeTimestamp) {
+  public CreateOrderRequest notBeforeTimestamp(@Nullable OffsetDateTime notBeforeTimestamp) {
     this.notBeforeTimestamp = notBeforeTimestamp;
     return this;
   }
 
   /**
-   * Optional earliest time at which the AD stack should begin executing the order
+   * Earliest time at which the AD stack should begin executing the order
    * @return notBeforeTimestamp
    */
   @Valid 
-  @Schema(name = "notBeforeTimestamp", description = "Optional earliest time at which the AD stack should begin executing the order", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @Schema(name = "notBeforeTimestamp", description = "Earliest time at which the AD stack should begin executing the order", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("notBeforeTimestamp")
   public @Nullable OffsetDateTime getNotBeforeTimestamp() {
     return notBeforeTimestamp;
@@ -194,7 +205,7 @@ public class RideOrderRequest {
     this.notBeforeTimestamp = notBeforeTimestamp;
   }
 
-  public RideOrderRequest constraints(@Nullable RideOrderRequestConstraints constraints) {
+  public CreateOrderRequest constraints(@Nullable DriveConstraints constraints) {
     this.constraints = constraints;
     return this;
   }
@@ -206,12 +217,12 @@ public class RideOrderRequest {
   @Valid 
   @Schema(name = "constraints", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("constraints")
-  public @Nullable RideOrderRequestConstraints getConstraints() {
+  public @Nullable DriveConstraints getConstraints() {
     return constraints;
   }
 
   @JsonProperty("constraints")
-  public void setConstraints(@Nullable RideOrderRequestConstraints constraints) {
+  public void setConstraints(@Nullable DriveConstraints constraints) {
     this.constraints = constraints;
   }
 
@@ -223,26 +234,26 @@ public class RideOrderRequest {
     if (o == null || getClass() != o.getClass()) {
       return false;
     }
-    RideOrderRequest rideOrderRequest = (RideOrderRequest) o;
-    return Objects.equals(this.source, rideOrderRequest.source) &&
-        Objects.equals(this.target, rideOrderRequest.target) &&
-        Objects.equals(this.priority, rideOrderRequest.priority) &&
-        Objects.equals(this.clientOrderId, rideOrderRequest.clientOrderId) &&
-        Objects.equals(this.notBeforeTimestamp, rideOrderRequest.notBeforeTimestamp) &&
-        Objects.equals(this.constraints, rideOrderRequest.constraints);
+    CreateOrderRequest createOrderRequest = (CreateOrderRequest) o;
+    return Objects.equals(this.source, createOrderRequest.source) &&
+        Objects.equals(this.stops, createOrderRequest.stops) &&
+        Objects.equals(this.priority, createOrderRequest.priority) &&
+        Objects.equals(this.clientOrderId, createOrderRequest.clientOrderId) &&
+        Objects.equals(this.notBeforeTimestamp, createOrderRequest.notBeforeTimestamp) &&
+        Objects.equals(this.constraints, createOrderRequest.constraints);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(source, target, priority, clientOrderId, notBeforeTimestamp, constraints);
+    return Objects.hash(source, stops, priority, clientOrderId, notBeforeTimestamp, constraints);
   }
 
   @Override
   public String toString() {
     StringBuilder sb = new StringBuilder();
-    sb.append("class RideOrderRequest {\n");
+    sb.append("class CreateOrderRequest {\n");
     sb.append("    source: ").append(toIndentedString(source)).append("\n");
-    sb.append("    target: ").append(toIndentedString(target)).append("\n");
+    sb.append("    stops: ").append(toIndentedString(stops)).append("\n");
     sb.append("    priority: ").append(toIndentedString(priority)).append("\n");
     sb.append("    clientOrderId: ").append(toIndentedString(clientOrderId)).append("\n");
     sb.append("    notBeforeTimestamp: ").append(toIndentedString(notBeforeTimestamp)).append("\n");

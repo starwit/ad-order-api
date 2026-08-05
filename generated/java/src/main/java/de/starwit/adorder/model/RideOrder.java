@@ -5,12 +5,17 @@ import java.util.Objects;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonValue;
+import de.starwit.adorder.model.DriveConstraints;
 import de.starwit.adorder.model.GeoPoint;
 import de.starwit.adorder.model.OrderSource;
 import de.starwit.adorder.model.OrderStatus;
 import de.starwit.adorder.model.RejectionReason;
+import de.starwit.adorder.model.Stop;
 import java.math.BigDecimal;
 import java.time.OffsetDateTime;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 import java.util.UUID;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.lang.Nullable;
@@ -29,7 +34,7 @@ import jakarta.annotation.Generated;
  */
 
 @Schema(name = "RideOrder", description = "A ride order and its current execution state")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-07-01T11:42:33.323681150+02:00[Europe/Berlin]", comments = "Generator version: 7.23.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-08-05T21:10:51.076418484+02:00[Europe/Berlin]", comments = "Generator version: 7.23.0")
 public class RideOrder {
 
   private UUID orderId;
@@ -38,7 +43,7 @@ public class RideOrder {
 
   private OrderSource source;
 
-  private GeoPoint target;
+  private List<@Valid Stop> stops = new ArrayList<>();
 
   private @Nullable GeoPoint startPosition;
 
@@ -83,7 +88,9 @@ public class RideOrder {
     }
   }
 
-  private @Nullable PriorityEnum priority;
+  private PriorityEnum priority = PriorityEnum.NORMAL;
+
+  private @Nullable DriveConstraints constraints;
 
   @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
   private OffsetDateTime createdAt;
@@ -109,10 +116,10 @@ public class RideOrder {
   /**
    * Constructor with only required parameters
    */
-  public RideOrder(UUID orderId, OrderSource source, GeoPoint target, OrderStatus status, OffsetDateTime createdAt) {
+  public RideOrder(UUID orderId, OrderSource source, List<@Valid Stop> stops, OrderStatus status, OffsetDateTime createdAt) {
     this.orderId = orderId;
     this.source = source;
-    this.target = target;
+    this.stops = stops;
     this.status = status;
     this.createdAt = createdAt;
   }
@@ -144,11 +151,11 @@ public class RideOrder {
   }
 
   /**
-   * Get clientOrderId
+   * Optional client-supplied idempotency key / external reference
    * @return clientOrderId
    */
   
-  @Schema(name = "clientOrderId", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @Schema(name = "clientOrderId", example = "fleet-job-88421", description = "Optional client-supplied idempotency key / external reference", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("clientOrderId")
   public @Nullable String getClientOrderId() {
     return clientOrderId;
@@ -180,25 +187,33 @@ public class RideOrder {
     this.source = source;
   }
 
-  public RideOrder target(GeoPoint target) {
-    this.target = target;
+  public RideOrder stops(List<@Valid Stop> stops) {
+    this.stops = stops;
+    return this;
+  }
+
+  public RideOrder addStopsItem(Stop stopsItem) {
+    if (this.stops == null) {
+      this.stops = new ArrayList<>();
+    }
+    this.stops.add(stopsItem);
     return this;
   }
 
   /**
-   * Get target
-   * @return target
+   * Ordered list of waypoints the vehicle shall visit. Must contain at least one stop (the final destination). The vehicle always departs from its current position at order acceptance time. 
+   * @return stops
    */
-  @NotNull @Valid 
-  @Schema(name = "target", requiredMode = Schema.RequiredMode.REQUIRED)
-  @JsonProperty("target")
-  public GeoPoint getTarget() {
-    return target;
+  @NotNull @Valid @Size(min = 1) 
+  @Schema(name = "stops", description = "Ordered list of waypoints the vehicle shall visit. Must contain at least one stop (the final destination). The vehicle always departs from its current position at order acceptance time. ", requiredMode = Schema.RequiredMode.REQUIRED)
+  @JsonProperty("stops")
+  public List<@Valid Stop> getStops() {
+    return stops;
   }
 
-  @JsonProperty("target")
-  public void setTarget(GeoPoint target) {
-    this.target = target;
+  @JsonProperty("stops")
+  public void setStops(List<@Valid Stop> stops) {
+    this.stops = stops;
   }
 
   public RideOrder startPosition(@Nullable GeoPoint startPosition) {
@@ -207,11 +222,11 @@ public class RideOrder {
   }
 
   /**
-   * Position of the vehicle at the time the order was accepted, recorded by the AD stack
+   * Get startPosition
    * @return startPosition
    */
   @Valid 
-  @Schema(name = "startPosition", description = "Position of the vehicle at the time the order was accepted, recorded by the AD stack", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @Schema(name = "startPosition", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("startPosition")
   public @Nullable GeoPoint getStartPosition() {
     return startPosition;
@@ -270,11 +285,11 @@ public class RideOrder {
   }
 
   /**
-   * Free-text detail, e.g. fault description when status is `failed`
+   * Free-text detail, e.g. fault description on failure
    * @return statusDetail
    */
   
-  @Schema(name = "statusDetail", description = "Free-text detail, e.g. fault description when status is `failed`", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @Schema(name = "statusDetail", description = "Free-text detail, e.g. fault description on failure", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("statusDetail")
   public @Nullable String getStatusDetail() {
     return statusDetail;
@@ -285,7 +300,7 @@ public class RideOrder {
     this.statusDetail = statusDetail;
   }
 
-  public RideOrder priority(@Nullable PriorityEnum priority) {
+  public RideOrder priority(PriorityEnum priority) {
     this.priority = priority;
     return this;
   }
@@ -297,13 +312,34 @@ public class RideOrder {
   
   @Schema(name = "priority", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("priority")
-  public @Nullable PriorityEnum getPriority() {
+  public PriorityEnum getPriority() {
     return priority;
   }
 
   @JsonProperty("priority")
-  public void setPriority(@Nullable PriorityEnum priority) {
+  public void setPriority(PriorityEnum priority) {
     this.priority = priority;
+  }
+
+  public RideOrder constraints(@Nullable DriveConstraints constraints) {
+    this.constraints = constraints;
+    return this;
+  }
+
+  /**
+   * Get constraints
+   * @return constraints
+   */
+  @Valid 
+  @Schema(name = "constraints", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @JsonProperty("constraints")
+  public @Nullable DriveConstraints getConstraints() {
+    return constraints;
+  }
+
+  @JsonProperty("constraints")
+  public void setConstraints(@Nullable DriveConstraints constraints) {
+    this.constraints = constraints;
   }
 
   public RideOrder createdAt(OffsetDateTime createdAt) {
@@ -396,11 +432,11 @@ public class RideOrder {
   }
 
   /**
-   * AD stack's current ETA estimate, updated while in_progress
+   * Current ETA at the final stop, updated while in_progress
    * @return estimatedArrival
    */
   @Valid 
-  @Schema(name = "estimatedArrival", description = "AD stack's current ETA estimate, updated while in_progress", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @Schema(name = "estimatedArrival", description = "Current ETA at the final stop, updated while in_progress", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("estimatedArrival")
   public @Nullable OffsetDateTime getEstimatedArrival() {
     return estimatedArrival;
@@ -417,11 +453,11 @@ public class RideOrder {
   }
 
   /**
-   * Remaining distance estimate while in_progress
+   * Remaining distance to final stop, updated while in_progress
    * @return distanceRemainingMeters
    */
   @Valid 
-  @Schema(name = "distanceRemainingMeters", description = "Remaining distance estimate while in_progress", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @Schema(name = "distanceRemainingMeters", description = "Remaining distance to final stop, updated while in_progress", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("distanceRemainingMeters")
   public @Nullable BigDecimal getDistanceRemainingMeters() {
     return distanceRemainingMeters;
@@ -444,12 +480,13 @@ public class RideOrder {
     return Objects.equals(this.orderId, rideOrder.orderId) &&
         Objects.equals(this.clientOrderId, rideOrder.clientOrderId) &&
         Objects.equals(this.source, rideOrder.source) &&
-        Objects.equals(this.target, rideOrder.target) &&
+        Objects.equals(this.stops, rideOrder.stops) &&
         Objects.equals(this.startPosition, rideOrder.startPosition) &&
         Objects.equals(this.status, rideOrder.status) &&
         Objects.equals(this.rejectionReason, rideOrder.rejectionReason) &&
         Objects.equals(this.statusDetail, rideOrder.statusDetail) &&
         Objects.equals(this.priority, rideOrder.priority) &&
+        Objects.equals(this.constraints, rideOrder.constraints) &&
         Objects.equals(this.createdAt, rideOrder.createdAt) &&
         Objects.equals(this.acceptedAt, rideOrder.acceptedAt) &&
         Objects.equals(this.startedAt, rideOrder.startedAt) &&
@@ -460,7 +497,7 @@ public class RideOrder {
 
   @Override
   public int hashCode() {
-    return Objects.hash(orderId, clientOrderId, source, target, startPosition, status, rejectionReason, statusDetail, priority, createdAt, acceptedAt, startedAt, completedAt, estimatedArrival, distanceRemainingMeters);
+    return Objects.hash(orderId, clientOrderId, source, stops, startPosition, status, rejectionReason, statusDetail, priority, constraints, createdAt, acceptedAt, startedAt, completedAt, estimatedArrival, distanceRemainingMeters);
   }
 
   @Override
@@ -470,12 +507,13 @@ public class RideOrder {
     sb.append("    orderId: ").append(toIndentedString(orderId)).append("\n");
     sb.append("    clientOrderId: ").append(toIndentedString(clientOrderId)).append("\n");
     sb.append("    source: ").append(toIndentedString(source)).append("\n");
-    sb.append("    target: ").append(toIndentedString(target)).append("\n");
+    sb.append("    stops: ").append(toIndentedString(stops)).append("\n");
     sb.append("    startPosition: ").append(toIndentedString(startPosition)).append("\n");
     sb.append("    status: ").append(toIndentedString(status)).append("\n");
     sb.append("    rejectionReason: ").append(toIndentedString(rejectionReason)).append("\n");
     sb.append("    statusDetail: ").append(toIndentedString(statusDetail)).append("\n");
     sb.append("    priority: ").append(toIndentedString(priority)).append("\n");
+    sb.append("    constraints: ").append(toIndentedString(constraints)).append("\n");
     sb.append("    createdAt: ").append(toIndentedString(createdAt)).append("\n");
     sb.append("    acceptedAt: ").append(toIndentedString(acceptedAt)).append("\n");
     sb.append("    startedAt: ").append(toIndentedString(startedAt)).append("\n");

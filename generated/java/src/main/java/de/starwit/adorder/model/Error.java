@@ -21,7 +21,7 @@ import jakarta.annotation.Generated;
  * Error
  */
 
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-07-01T11:42:33.323681150+02:00[Europe/Berlin]", comments = "Generator version: 7.23.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-08-05T21:10:51.076418484+02:00[Europe/Berlin]", comments = "Generator version: 7.23.0")
 public class Error {
 
   private String code;
@@ -52,7 +52,7 @@ public class Error {
    * @return code
    */
   @NotNull 
-  @Schema(name = "code", example = "TARGET_UNREACHABLE", requiredMode = Schema.RequiredMode.REQUIRED)
+  @Schema(name = "code", example = "ORDER_NOT_FOUND", requiredMode = Schema.RequiredMode.REQUIRED)
   @JsonProperty("code")
   public String getCode() {
     return code;
@@ -73,7 +73,7 @@ public class Error {
    * @return message
    */
   @NotNull 
-  @Schema(name = "message", example = "The requested target location is outside the vehicle's operational domain.", requiredMode = Schema.RequiredMode.REQUIRED)
+  @Schema(name = "message", example = "No order with the given ID exists.", requiredMode = Schema.RequiredMode.REQUIRED)
   @JsonProperty("message")
   public String getMessage() {
     return message;

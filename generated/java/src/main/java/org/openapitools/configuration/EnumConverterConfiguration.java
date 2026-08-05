@@ -4,6 +4,7 @@ import java.math.BigDecimal;
 import java.net.URI;
 import java.util.UUID;
 
+import de.starwit.adorder.model.AdStackMode;
 import de.starwit.adorder.model.OrderStatus;
 import de.starwit.adorder.model.RejectionReason;
 
@@ -21,6 +22,15 @@ import org.springframework.core.convert.converter.Converter;
 @Configuration(value = "org.openapitools.configuration.enumConverterConfiguration")
 public class EnumConverterConfiguration {
 
+    @Bean(name = "org.openapitools.configuration.EnumConverterConfiguration.adStackModeConverter")
+    Converter<String, AdStackMode> adStackModeConverter() {
+        return new Converter<String, AdStackMode>() {
+            @Override
+            public AdStackMode convert(String source) {
+                return AdStackMode.fromValue(source);
+            }
+        };
+    }
     @Bean(name = "org.openapitools.configuration.EnumConverterConfiguration.orderStatusConverter")
     Converter<String, OrderStatus> orderStatusConverter() {
         return new Converter<String, OrderStatus>() {

@@ -11,22 +11,22 @@
 use crate::models;
 use serde::{Deserialize, Serialize};
 
+/// ComponentList : Full inventory of software components in the AD stack
 #[derive(Clone, Default, Debug, PartialEq, Serialize, Deserialize)]
-pub struct Error {
-    #[serde(rename = "code")]
-    pub code: String,
-    #[serde(rename = "message")]
-    pub message: String,
-    #[serde(rename = "details", skip_serializing_if = "Option::is_none")]
-    pub details: Option<std::collections::HashMap<String, serde_json::Value>>,
+pub struct ComponentList {
+    #[serde(rename = "components")]
+    pub components: Vec<models::SoftwareComponent>,
+    /// Time at which the inventory was captured
+    #[serde(rename = "timestamp")]
+    pub timestamp: chrono::DateTime<chrono::FixedOffset>,
 }
 
-impl Error {
-    pub fn new(code: String, message: String) -> Error {
-        Error {
-            code,
-            message,
-            details: None,
+impl ComponentList {
+    /// Full inventory of software components in the AD stack
+    pub fn new(components: Vec<models::SoftwareComponent>, timestamp: chrono::DateTime<chrono::FixedOffset>) -> ComponentList {
+        ComponentList {
+            components,
+            timestamp,
         }
     }
 }

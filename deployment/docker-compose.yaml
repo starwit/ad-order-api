@@ -1,0 +1,15 @@
+
+services:
+  mosquitto:
+    image: eclipse-mosquitto:latest
+    container_name: mosquitto
+    restart: unless-stopped
+    ports:
+      - "1883:1883"   # Default MQTT port
+      - "9001:9001"   # MQTT over WebSockets (optional)
+    volumes:
+      - ./mosquitto/config:/mosquitto/config
+      - ./mosquitto/data:/mosquitto/data
+      - ./mosquitto/log:/mosquitto/log
+    # Standard security practice: run container using correct ownership permissions
+    user: "${UID:-1883}:${GID:-1883}"

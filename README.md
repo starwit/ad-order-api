@@ -1,15 +1,14 @@
 # AD Stack Ride Order API
 
-An OpenAPI specification and generated client/server stubs for submitting and managing ride orders to a vehicle's autonomous driving (AD) stack.
+An OpenAPI specification and generated client/server stubs for submitting and managing ride orders to a vehicle's autonomous driving (AD) stack. It also defines data types to subscribe to vehicle status data.
 
 ## What this repo does
 
 Defines the `AD Stack Ride Order API` (v0.0.1) — a REST API that runs on a vehicle's onboard network and serves exactly one vehicle. It covers:
 
-- Submitting ride orders (target location, priority, constraints)
-- Querying order status and listing order history
-- Cancelling active orders
-- Reading current vehicle/AD stack state (position, readiness)
+- No API calls are defined in `spec/order-api.yaml`.
+
+
 
 Onboard HMIs call the API directly; external backend systems reach it via an API gateway responsible for vehicle identification and routing. The API carries no customer or passenger data.
 

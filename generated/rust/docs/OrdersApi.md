@@ -5,10 +5,10 @@ All URIs are relative to *http://localhost:8080/api/v1*
 Method | HTTP request | Description
 ------------- | ------------- | -------------
 [**cancel_order**](OrdersApi.md#cancel_order) | **POST** /orders/{orderId}/cancel | Cancel a ride order
-[**create_order**](OrdersApi.md#create_order) | **POST** /orders | Submit a new ride order
-[**get_active_order**](OrdersApi.md#get_active_order) | **GET** /orders/active | Get the currently active order, if any
+[**create_order**](OrdersApi.md#create_order) | **POST** /orders | Create a new ride order
 [**get_order**](OrdersApi.md#get_order) | **GET** /orders/{orderId} | Get a specific ride order
-[**list_orders**](OrdersApi.md#list_orders) | **GET** /orders | List ride orders
+[**list_orders**](OrdersApi.md#list_orders) | **GET** /orders | List all ride orders
+[**update_order**](OrdersApi.md#update_order) | **PATCH** /orders/{orderId} | Update a ride order
 
 
 
@@ -17,7 +17,7 @@ Method | HTTP request | Description
 > models::RideOrder cancel_order(order_id, cancel_order_request)
 Cancel a ride order
 
-Requests cancellation of an active (accepted or in-progress) order. Cancellation is not guaranteed to be immediate; the AD stack must bring the vehicle to a safe stop before the order transitions to `cancelled`. 
+Requests cancellation of an active order. The AD stack brings the vehicle to a safe stop before transitioning the order to `cancelled`, so the transition is asynchronous. 
 
 ### Parameters
 
@@ -45,17 +45,17 @@ No authorization required
 
 ## create_order
 
-> models::RideOrder create_order(ride_order_request)
-Submit a new ride order
+> models::RideOrder create_order(create_order_request)
+Create a new ride order
 
-Creates a new ride order instructing the AD stack to drive the vehicle from its current position to the specified target location. The AD stack evaluates feasibility and responds with the created order, which may already be in a rejected state if infeasible. 
+Submits a new ride order to the AD stack. The stack evaluates feasibility immediately; the returned order may already be in `rejected` state if the request cannot be fulfilled. 
 
 ### Parameters
 
 
 Name | Type | Description  | Required | Notes
 ------------- | ------------- | ------------- | ------------- | -------------
-**ride_order_request** | [**RideOrderRequest**](RideOrderRequest.md) |  | [required] |
+**create_order_request** | [**CreateOrderRequest**](CreateOrderRequest.md) |  | [required] |
 
 ### Return type
 
@@ -68,33 +68,6 @@ No authorization required
 ### HTTP request headers
 
 - **Content-Type**: application/json
-- **Accept**: application/json
-
-[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
-
-
-## get_active_order
-
-> models::RideOrder get_active_order()
-Get the currently active order, if any
-
-Convenience endpoint returning the single order currently being executed or pending execution by the AD stack (status `accepted` or `in_progress`). 
-
-### Parameters
-
-This endpoint does not need any parameter.
-
-### Return type
-
-[**models::RideOrder**](RideOrder.md)
-
-### Authorization
-
-No authorization required
-
-### HTTP request headers
-
-- **Content-Type**: Not defined
 - **Accept**: application/json
 
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
@@ -130,8 +103,10 @@ No authorization required
 
 ## list_orders
 
-> models::ListOrders200Response list_orders(status, limit, offset)
-List ride orders
+> models::OrderList list_orders(status, limit, offset)
+List all ride orders
+
+Returns all orders, optionally filtered by status.
 
 ### Parameters
 
@@ -144,7 +119,7 @@ Name | Type | Description  | Required | Notes
 
 ### Return type
 
-[**models::ListOrders200Response**](listOrders_200_response.md)
+[**models::OrderList**](OrderList.md)
 
 ### Authorization
 
@@ -153,6 +128,37 @@ No authorization required
 ### HTTP request headers
 
 - **Content-Type**: Not defined
+- **Accept**: application/json
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
+
+## update_order
+
+> models::RideOrder update_order(order_id, update_order_request)
+Update a ride order
+
+Updates a pending or accepted order. Only `stops`, `priority`, and `constraints` may be updated. Updates to an `in_progress` order are limited to appending new stops; changes to already-reached stops or the priority of an active drive are rejected with 409. 
+
+### Parameters
+
+
+Name | Type | Description  | Required | Notes
+------------- | ------------- | ------------- | ------------- | -------------
+**order_id** | **uuid::Uuid** | Unique identifier of the ride order | [required] |
+**update_order_request** | [**UpdateOrderRequest**](UpdateOrderRequest.md) |  | [required] |
+
+### Return type
+
+[**models::RideOrder**](RideOrder.md)
+
+### Authorization
+
+No authorization required
+
+### HTTP request headers
+
+- **Content-Type**: application/json
 - **Accept**: application/json
 
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)

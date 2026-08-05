@@ -5,3 +5,7 @@ target
 
 # Rust
 .cargo
+
+#docker
+data
+log

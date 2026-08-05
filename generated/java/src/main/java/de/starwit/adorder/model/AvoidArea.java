@@ -4,7 +4,6 @@ import java.net.URI;
 import java.util.Objects;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonCreator;
-import com.fasterxml.jackson.annotation.JsonTypeName;
 import de.starwit.adorder.model.GeoPoint;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -21,18 +20,29 @@ import java.util.*;
 import jakarta.annotation.Generated;
 
 /**
- * RideOrderRequestConstraintsAvoidAreasInner
+ * A geofenced area the vehicle should avoid
  */
 
-@JsonTypeName("RideOrderRequest_constraints_avoidAreas_inner")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-07-01T11:42:33.323681150+02:00[Europe/Berlin]", comments = "Generator version: 7.23.0")
-public class RideOrderRequestConstraintsAvoidAreasInner {
+@Schema(name = "AvoidArea", description = "A geofenced area the vehicle should avoid")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-08-05T21:10:51.076418484+02:00[Europe/Berlin]", comments = "Generator version: 7.23.0")
+public class AvoidArea {
 
   private @Nullable String label;
 
   private List<@Valid GeoPoint> polygon = new ArrayList<>();
 
-  public RideOrderRequestConstraintsAvoidAreasInner label(@Nullable String label) {
+  public AvoidArea() {
+    super();
+  }
+
+  /**
+   * Constructor with only required parameters
+   */
+  public AvoidArea(List<@Valid GeoPoint> polygon) {
+    this.polygon = polygon;
+  }
+
+  public AvoidArea label(@Nullable String label) {
     this.label = label;
     return this;
   }
@@ -53,12 +63,12 @@ public class RideOrderRequestConstraintsAvoidAreasInner {
     this.label = label;
   }
 
-  public RideOrderRequestConstraintsAvoidAreasInner polygon(List<@Valid GeoPoint> polygon) {
+  public AvoidArea polygon(List<@Valid GeoPoint> polygon) {
     this.polygon = polygon;
     return this;
   }
 
-  public RideOrderRequestConstraintsAvoidAreasInner addPolygonItem(GeoPoint polygonItem) {
+  public AvoidArea addPolygonItem(GeoPoint polygonItem) {
     if (this.polygon == null) {
       this.polygon = new ArrayList<>();
     }
@@ -67,11 +77,11 @@ public class RideOrderRequestConstraintsAvoidAreasInner {
   }
 
   /**
-   * Closed polygon as a list of points
+   * Closed polygon defined as an ordered list of GeoPoints
    * @return polygon
    */
-  @Valid 
-  @Schema(name = "polygon", description = "Closed polygon as a list of points", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @NotNull @Valid @Size(min = 3) 
+  @Schema(name = "polygon", description = "Closed polygon defined as an ordered list of GeoPoints", requiredMode = Schema.RequiredMode.REQUIRED)
   @JsonProperty("polygon")
   public List<@Valid GeoPoint> getPolygon() {
     return polygon;
@@ -90,9 +100,9 @@ public class RideOrderRequestConstraintsAvoidAreasInner {
     if (o == null || getClass() != o.getClass()) {
       return false;
     }
-    RideOrderRequestConstraintsAvoidAreasInner rideOrderRequestConstraintsAvoidAreasInner = (RideOrderRequestConstraintsAvoidAreasInner) o;
-    return Objects.equals(this.label, rideOrderRequestConstraintsAvoidAreasInner.label) &&
-        Objects.equals(this.polygon, rideOrderRequestConstraintsAvoidAreasInner.polygon);
+    AvoidArea avoidArea = (AvoidArea) o;
+    return Objects.equals(this.label, avoidArea.label) &&
+        Objects.equals(this.polygon, avoidArea.polygon);
   }
 
   @Override
@@ -103,7 +113,7 @@ public class RideOrderRequestConstraintsAvoidAreasInner {
   @Override
   public String toString() {
     StringBuilder sb = new StringBuilder();
-    sb.append("class RideOrderRequestConstraintsAvoidAreasInner {\n");
+    sb.append("class AvoidArea {\n");
     sb.append("    label: ").append(toIndentedString(label)).append("\n");
     sb.append("    polygon: ").append(toIndentedString(polygon)).append("\n");
     sb.append("}");
