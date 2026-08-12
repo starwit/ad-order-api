@@ -20,7 +20,7 @@ import com.fasterxml.jackson.annotation.JsonValue;
  * Current operational mode of the AD stack
  */
 
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-08-05T21:10:51.076418484+02:00[Europe/Berlin]", comments = "Generator version: 7.23.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-08-07T23:24:20.986589197+02:00[Europe/Berlin]", comments = "Generator version: 7.23.0")
 public enum AdStackMode {
   
   INITIALIZING("initializing"),

@@ -1,0 +1,23 @@
+spring:
+  application:
+    name: ad-order-server
+
+server:
+  port: 8080
+  servlet:
+    context-path: /api/v1
+
+mqtt:
+  broker-url: tcp://localhost:1883
+  client-id: ad-order-server
+  topic:
+    vehicle-status: /vehicle/status
+    vehicle-orders: /vehicle/orders
+  publish-interval-ms: 2000   # how often VehicleStatus is pushed even without changes
+  qos: 1
+
+springdoc:
+  swagger-ui:
+    path: /swagger-ui.html
+  api-docs:
+    path: /v3/api-docs
